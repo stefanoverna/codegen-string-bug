@@ -1,25 +1,53 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { graphql } from './gql';
+
+const episodeFragment = graphql(/* GraphQL */ `
+  fragment EpisodeFragment on Episode {
+    id
+    title
+    show {
+      id
+      title
+    }
+    releaseDate
+    __typename
+  }
+`);
+const movieFragment = graphql(/* GraphQL */ `
+  fragment MovieFragment on Movie {
+    id
+    title
+    collection {
+      id
+    }
+    releaseDate
+    __typename
+  }
+`);
+
+const videoDetailsFragment = graphql(/* GraphQL */ `
+  fragment DetailsFragment on Video {
+    title
+    __typename
+    ...MovieFragment
+    ...EpisodeFragment
+  }
+`);
+
+const videoQueryDocument = graphql(/* GraphQL */ `
+  query Video($id: ID!) {
+    video(id: $id) {
+      ...DetailsFragment
+      __typename
+    }
+  }
+`);
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <pre>
+      {videoQueryDocument.toString()}
+    </pre>
   );
 }
 
